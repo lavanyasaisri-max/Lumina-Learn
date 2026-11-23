@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumina Learn — Explore Courses & Master New Skills</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            slateBg: '#F8FAFC',
+            navyDeep: '#1E293B',
+            indigoPrimary: '#4F46E5',
+            indigoHover: '#4338CA',
+          },
+          boxShadow: {
+            soft: '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
+            cardHover: '0 14px 30px -6px rgba(79, 70, 229, 0.12)',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Custom scrollbar & subtle utility styles */
+    body {
+      background-color: #F8FAFC;
+      color: #1E293B;
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Modal backdrop blur animation */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes slideRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    .animate-slide-up {
+      animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .animate-slide-right {
+      animation: slideRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- Toast Notification Container (Replaces alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Sticky Navigation Header -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-4">
+      <!-- Brand Logo -->
+      <a href="#" onclick="resetAllFilters(); return false;" class="flex items-center gap-2.5 group focus:outline-none">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">Lumina<span class="text-indigo-600">Learn</span></span>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
+        <a href="#explore-section" class="hover:text-indigo-600 transition-colors">Explore Courses</a>
+        <a href="#learning-paths" class="hover:text-indigo-600 transition-colors">Career Paths</a>
+        <a href="#instructors-section" class="hover:text-indigo-600 transition-colors">Instructors</a>
+      </nav>
+
+      <!-- Right Actions: My Courses Drawer Trigger -->
+      <div class="flex items-center gap-3">
+        <button id="open-my-learning-btn" onclick="openMyLearningDrawer()" class="relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-sm font-semibold transition-all shadow-sm active:scale-[0.98]">
+          <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          </svg>
+          <span>My Learning</span>
+          <span id="enrolled-count-badge" class="ml-0.5 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-500 text-white">2</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Instant Search Section -->
+  <section class="relative overflow-hidden bg-white border-b border-slate-200/70 pt-10 pb-12 sm:pt-14 sm:pb-16">
+    <!-- Decorative Soft Background Gradients -->
+    <div class="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-indigo-50 blur-3xl opacity-80"></div>
+    <div class="pointer-events-none absolute top-28 -left-24 w-80 h-80 rounded-full bg-amber-50 blur-3xl opacity-70"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>2026 Curriculum Updated • Learn at your own pace</span>
+        </div>
+
+        <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-4">
+          Find the right course to <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">spark your next chapter.</span>
+        </h1>
+
+        <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+          Browse structured, project-based courses taught by industry practitioners. Inspect full syllabi, read verified student reviews, and start learning today.
+        </p>
+
+        <!-- Search Input Bar -->
+        <div class="relative max-w-2xl mx-auto">
+          <div class="flex items-center bg-white rounded-2xl border-2 border-slate-200 focus-within:border-indigo-500 shadow-soft transition-all p-1.5 sm:p-2">
+            <div class="pl-3 pr-2 text-slate-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search by course title, skill (e.g., React, Python, Figma), or instructor..."
+              class="w-full py-2 px-2 text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+              oninput="handleSearchInput(this.value)"
+            />
+            <button
+              id="clear-search-btn"
+              onclick="clearSearch()"
+              class="hidden px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 mr-1"
+              title="Clear search"
+            >
+              Clear
+            </button>
+            <a href="#explore-section" class="shrink-0 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">
+              Search
+            </a>
+          </div>
+
+          <!-- Popular Quick Tags -->
+          <div class="mt-3.5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
+            <span class="font-medium text-slate-400">Popular searches:</span>
+            <button onclick="quickSearch('Full-Stack')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">Full-Stack</button>
+            <button onclick="quickSearch('Python')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">Python & AI</button>
+            <button onclick="quickSearch('UI/UX')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">UI/UX Figma</button>
+            <button onclick="quickSearch('Free')" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium transition-colors">Free Courses</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Metrics Strip -->
+      <div class="mt-10 pt-8 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-center">
+        <div>
+          <div class="font-display font-bold text-xl sm:text-2xl text-slate-900">48,000+</div>
+          <div class="text-xs sm:text-sm text-slate-500">Active Students</div>
+        </div>
+        <div>
+          <div class="font-display font-bold text-xl sm:text-2xl text-slate-900">4.85 / 5</div>
+          <div class="text-xs sm:text-sm text-slate-500">Average Course Rating</div>
+        </div>
+        <div>
+          <div class="font-display font-bold text-xl sm:text-2xl text-slate-900">100% Hands-On</div>
+          <div class="text-xs sm:text-sm text-slate-500">Portfolio Projects</div>
+        </div>
+        <div>
+          <div class="font-display font-bold text-xl sm:text-2xl text-slate-900">Verified</div>
+          <div class="text-xs sm:text-sm text-slate-500">Completion Certificates</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Course Exploration Section -->
+  <main id="explore-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+    <!-- Category Pills Bar -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display text-xl sm:text-2xl font-bold text-slate-900">Explore Courses</h2>
+        <span id="results-count-label" class="text-sm font-medium text-slate-500">Showing 9 courses</span>
+      </div>
+
+      <div id="category-pills-container" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </div>
+
+    <!-- Secondary Filter & Sort Toolbar -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 mb-8 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Skill Level Filter Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1">Skill Level:</span>
+        <div id="level-filter-group" class="inline-flex flex-wrap gap-1.5">
+          <button data-level="All" onclick="setLevelFilter('All')" class="level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white transition-all">All Levels</button>
+          <button data-level="Beginner" onclick="setLevelFilter('Beginner')" class="level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Beginner</button>
+          <button data-level="Intermediate" onclick="setLevelFilter('Intermediate')" class="level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Intermediate</button>
+          <button data-level="Advanced" onclick="setLevelFilter('Advanced')" class="level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Advanced</button>
+        </div>
+      </div>
+
+      <!-- Active Instructor Chip (shown if filtered by instructor) + Sort Dropdown -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div id="active-instructor-chip" class="hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold">
+          <span>Instructor: <strong id="active-instructor-name"></strong></span>
+          <button onclick="clearInstructorFilter()" class="hover:text-indigo-950 font-bold ml-1" title="Remove filter">&times;</button>
+        </div>
+
+        <div class="flex items-center gap-2 ml-auto">
+          <label for="sort-select" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Sort by:</label>
+          <select id="sort-select" onchange="setSortBy(this.value)" class="bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-medium rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer">
+            <option value="popular">Most Popular</option>
+            <option value="rating">Highest Rated</option>
+            <option value="duration">Shortest Duration</option>
+            <option value="price-low">Price: Free & Low to High</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Cards Grid -->
+    <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+      <!-- Rendered dynamically via JS -->
+    </div>
+
+    <!-- Empty Search State -->
+    <div id="empty-state" class="hidden bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto my-8 shadow-soft">
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 class="font-display text-xl font-bold text-slate-900 mb-2">No matching courses found</h3>
+      <p class="text-sm text-slate-500 mb-6">Try adjusting your search keywords, switching categories, or clearing the skill level filter.</p>
+      <button onclick="resetAllFilters()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">
+        Reset All Filters
+      </button>
+    </div>
+
+    <!-- Curated Learning Paths Banner -->
+    <section id="learning-paths" class="mt-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-7 gap-3">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Guided Roadmaps</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Not sure where to start? Pick a Path</h2>
+        </div>
+        <p class="text-sm text-slate-500 max-w-md">Click any career track to filter courses tailored to that goal.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div onclick="applyPathFilter('Web Development')" class="cursor-pointer group bg-white rounded-2xl border border-slate-200/90 hover:border-indigo-300 p-6 shadow-soft hover:shadow-cardHover transition-all">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
+          <h3 class="font-display font-bold text-lg text-slate-900 mb-1.5 group-hover:text-indigo-600 transition-colors">Modern Web Engineer</h3>
+          <p class="text-sm text-slate-500 mb-4 leading-relaxed">Master responsive interfaces, TypeScript, React architecture, and production APIs.</p>
+          <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
+            Explore Web Dev Courses <span>&rarr;</span>
+          </span>
+        </div>
+
+        <div onclick="applyPathFilter('Data Science & AI')" class="cursor-pointer group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-300 p-6 shadow-soft hover:shadow-cardHover transition-all">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="font-display font-bold text-lg text-slate-900 mb-1.5 group-hover:text-emerald-600 transition-colors">Applied AI & Data Analyst</h3>
+          <p class="text-sm text-slate-500 mb-4 leading-relaxed">Build Python data pipelines, train machine learning models, and deploy LLM apps.</p>
+          <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+            Explore Data & AI Courses <span>&rarr;</span>
+          </span>
+        </div>
+
+        <div onclick="applyPathFilter('UI/UX Design')" class="cursor-pointer group bg-white rounded-2xl border border-slate-200/90 hover:border-amber-300 p-6 shadow-soft hover:shadow-cardHover transition-all">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+          </div>
+          <h3 class="font-display font-bold text-lg text-slate-900 mb-1.5 group-hover:text-amber-600 transition-colors">Product & UI/UX Designer</h3>
+          <p class="text-sm text-slate-500 mb-4 leading-relaxed">Design accessible interfaces, interactive Figma prototypes, and scalable design systems.</p>
+          <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+            Explore Design Courses <span>&rarr;</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Instructors Showcase Section -->
+    <section id="instructors-section" class="mt-20 pt-14 border-t border-slate-200/80">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Learn From Practitioners</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Meet Your Instructors</h2>
+        </div>
+        <p class="text-sm text-slate-500 max-w-md">Real engineers, designers, and founders sharing practical frameworks from the field.</p>
+      </div>
+
+      <div id="instructors-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-300 mt-16 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+        <div>
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <span class="font-display font-bold text-lg text-white">LuminaLearn</span>
+          </div>
+          <p class="text-sm text-slate-400 max-w-md">Empowering curious minds worldwide with clear, structured, and project-driven online education.</p>
+        </div>
+        <div class="flex flex-wrap gap-6 text-sm text-slate-400">
+          <a href="#explore-section" class="hover:text-white transition-colors">Course Catalog</a>
+          <a href="#learning-paths" class="hover:text-white transition-colors">Learning Paths</a>
+          <a href="#instructors-section" class="hover:text-white transition-colors">Instructors</a>
+          <button onclick="openMyLearningDrawer()" class="hover:text-white transition-colors">My Learning</button>
+        </div>
+      </div>
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+        <p>&copy; 2026 LuminaLearn Inc. All rights reserved.</p>
+        <p>Built for learners everywhere.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       INTERACTIVE COURSE DETAIL MODAL
+  ====================================================================== -->
+  <div id="course-detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Backdrop -->
+    <div onclick="closeCourseModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in"></div>
+
+    <!-- Modal Panel -->
+    <div class="relative min-h-screen sm:min-h-0 sm:my-8 max-w-5xl mx-auto bg-white sm:rounded-3xl shadow-2xl overflow-hidden animate-slide-up border border-slate-200">
+      <!-- Top Close Bar -->
+      <div class="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200 px-5 sm:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <span id="modal-breadcrumb-category" class="text-indigo-600">Category</span>
+          <span>/</span>
+          <span id="modal-breadcrumb-level">Level</span>
+        </div>
+        <button onclick="closeCourseModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors" aria-label="Close modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content Container (Injected dynamically) -->
+      <div id="course-modal-body" class="p-5 sm:p-8"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       "MY LEARNING" SLIDE-OVER DRAWER
+  ====================================================================== -->
+  <div id="my-learning-drawer" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <!-- Backdrop -->
+    <div onclick="closeMyLearningDrawer()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs animate-fade-in"></div>
+
+    <!-- Drawer Panel -->
+    <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl border-l border-slate-200 flex flex-col animate-slide-right">
+      <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div>
+          <h2 class="font-display font-bold text-xl text-slate-900">My Learning</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Track your progress & continue lessons</p>
+        </div>
+        <button onclick="closeMyLearningDrawer()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-200/70 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Enrolled Courses List -->
+      <div id="my-learning-list" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="p-5 border-t border-slate-200 bg-slate-50">
+        <button onclick="closeMyLearningDrawer()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">
+          Browse More Courses
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       APPLICATION DATA & LOGIC
+  ====================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // 1. MOCK DATABASE: INSTRUCTORS & COURSES
+    // -----------------------------------------------------------------------
+    const INSTRUCTORS = {
+      elena: {
+        id: 'elena',
+        name: 'Dr. Elena Rostova',
+        title: 'Principal AI & Data Scientist',
+        specialty: 'Data Science & AI',
+        initials: 'ER',
+        avatarBg: 'from-emerald-500 to-teal-600',
+        rating: 4.9,
+        students: '18,400',
+        coursesCount: 2,
+        bio: 'Former lead ML researcher with 11+ years building production recommendation engines and natural language models. Elena breaks down complex math into intuitive Python code.'
+      },
+      marcus: {
+        id: 'marcus',
+        name: 'Marcus Vance',
+        title: 'Staff Frontend Architect',
+        specialty: 'Web Development',
+        initials: 'MV',
+        avatarBg: 'from-indigo-500 to-blue-600',
+        rating: 4.9,
+        students: '24,150',
+        coursesCount: 2,
+        bio: 'Marcus has architected high-traffic web applications for global fintech and SaaS platforms. He specializes in React, TypeScript, and web performance optimization.'
+      },
+      sophia: {
+        id: 'sophia',
+        name: 'Sophia Chen',
+        title: 'Design Systems Lead',
+        specialty: 'UI/UX Design',
+        initials: 'SC',
+        avatarBg: 'from-amber-500 to-orange-600',
+        rating: 4.8,
+        students: '14,900',
+        coursesCount: 2,
+        bio: 'Award-winning product designer focused on human-centered interfaces, accessibility, and multi-brand Figma component libraries.'
+      },
+      david: {
+        id: 'david',
+        name: 'David Okafor',
+        title: 'Growth & Brand Strategist',
+        specialty: 'Digital Marketing & Business',
+        initials: 'DO',
+        avatarBg: 'from-rose-500 to-pink-600',
+        rating: 4.8,
+        students: '11,200',
+        coursesCount: 3,
+        bio: 'Startup advisor and former VP of Growth who has scaled three B2B and consumer brands from zero to millions in recurring revenue.'
+      }
+    };
+
+    const CATEGORIES = [
+      'All Courses',
+      'Web Development',
+      'Data Science & AI',
+      'UI/UX Design',
+      'Digital Marketing',
+      'Creative Arts',
+      'Business & Finance'
+    ];
+
+    const COURSES = [
+      {
+        id: 'c1',
+        title: 'Full-Stack React & TypeScript Mastery',
+        category: 'Web Development',
+        level: 'Intermediate',
+        instructorId: 'marcus',
+        rating: 4.9,
+        reviewCount: 1284,
+        studentsEnrolled: 9420,
+        durationHours: 24,
+        lessonsCount: 48,
+        price: 49,
+        themeGradient: 'from-indigo-600 via-blue-600 to-cyan-500',
+        iconType: 'code',
+        shortDesc: 'Build scalable, type-safe web applications from scratch using React 19, TypeScript, Tailwind CSS, and REST/GraphQL APIs.',
+        fullDesc: 'Go beyond basic tutorials and learn how senior engineers structure production React applications. You will build a complete collaborative project management app with authentication, optimistic UI updates, and automated testing.',
+        outcomes: [
+          'Architect reusable, strongly-typed React components with TypeScript',
+          'Manage complex client and server state cleanly without boilerplate',
+          'Implement accessible keyboard navigation and responsive Tailwind layouts',
+          'Deploy full-stack applications with CI/CD pipelines and performance audits'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: TypeScript Foundations for React',
+            duration: '4h 30m',
+            lessons: [
+              { title: '1.1 Why TypeScript Saves Hours in Production', time: '22m' },
+              { title: '1.2 Generics, Utility Types & Discriminated Unions', time: '48m' },
+              { title: '1.3 Typing Props, Hooks, and Custom Events', time: '55m' }
+            ]
+          },
+          {
+            module: 'Module 2: Component Patterns & State Architecture',
+            duration: '7h 15m',
+            lessons: [
+              { title: '2.1 Compound Components & Render Delegation', time: '1h 10m' },
+              { title: '2.2 Data Fetching, Caching & Optimistic Updates', time: '1h 35m' },
+              { title: '2.3 Form Validation & Error Boundaries', time: '50m' }
+            ]
+          },
+          {
+            module: 'Module 3: Capstone SaaS Build & Deployment',
+            duration: '12h 15m',
+            lessons: [
+              { title: '3.1 Designing the Database & API Contract', time: '1h 20m' },
+              { title: '3.2 Building Real-Time Task Boards', time: '2h 15m' },
+              { title: '3.3 Core Web Vitals Optimization & Launch', time: '1h 05m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Aarav Patel', rating: 5, date: '2 weeks ago', comment: 'Hands down the clearest TypeScript + React course I have taken. The capstone project helped me land my frontend internship!' },
+          { user: 'Hannah Brooks', rating: 5, date: '1 month ago', comment: 'Marcus explains the "why" behind architectural decisions instead of just typing code. Worth every penny.' }
+        ]
+      },
+      {
+        id: 'c2',
+        title: 'Applied Python & Generative AI Engineering',
+        category: 'Data Science & AI',
+        level: 'Beginner',
+        instructorId: 'elena',
+        rating: 4.9,
+        reviewCount: 1540,
+        studentsEnrolled: 12300,
+        durationHours: 20,
+        lessonsCount: 42,
+        price: 59,
+        themeGradient: 'from-emerald-600 via-teal-600 to-cyan-600',
+        iconType: 'ai',
+        shortDesc: 'Learn Python fundamentals, data analysis with Pandas, and how to build Retrieval-Augmented Generation (RAG) AI apps.',
+        fullDesc: 'Designed for beginners and career-switchers, this course takes you from writing your very first Python script to building intelligent AI assistants grounded in your own documents.',
+        outcomes: [
+          'Write clean, idiomatic Python code using functions, classes, and APIs',
+          'Clean, visualize, and analyze real-world datasets with Pandas',
+          'Understand embeddings, vector databases, and prompt engineering',
+          'Build and deploy a document Q&A assistant using modern LLM APIs'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Python Essentials from Zero',
+            duration: '6h 00m',
+            lessons: [
+              { title: '1.1 Setting Up Your Python Environment', time: '25m' },
+              { title: '1.2 Data Structures: Lists, Dicts & Comprehensions', time: '1h 15m' },
+              { title: '1.3 Working with JSON & External REST APIs', time: '1h 10m' }
+            ]
+          },
+          {
+            module: 'Module 2: Data Wrangling & Visualization',
+            duration: '6h 30m',
+            lessons: [
+              { title: '2.1 Exploratory Data Analysis with Pandas', time: '1h 40m' },
+              { title: '2.2 Handling Missing Data & Feature Engineering', time: '1h 20m' }
+            ]
+          },
+          {
+            module: 'Module 3: Building Practical AI Applications',
+            duration: '7h 30m',
+            lessons: [
+              { title: '3.1 How Large Language Models & Embeddings Work', time: '55m' },
+              { title: '3.2 Building a Semantic Search & RAG Pipeline', time: '2h 05m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Liam O’Connor', rating: 5, date: '5 days ago', comment: 'Dr. Rostova makes AI concepts feel completely approachable even without a math degree.' },
+          { user: 'Priya Nair', rating: 5, date: '3 weeks ago', comment: 'The RAG module alone saved me weeks of trial and error at my job.' }
+        ]
+      },
+      {
+        id: 'c3',
+        title: 'UI/UX Design Systems & Figma Prototyping',
+        category: 'UI/UX Design',
+        level: 'Beginner',
+        instructorId: 'sophia',
+        rating: 4.8,
+        reviewCount: 920,
+        studentsEnrolled: 8650,
+        durationHours: 16,
+        lessonsCount: 34,
+        price: 0,
+        themeGradient: 'from-amber-500 via-orange-500 to-rose-500',
+        iconType: 'design',
+        shortDesc: 'Master Figma auto-layout, typography, color psychology, and interactive prototyping to design apps users love.',
+        fullDesc: 'A complete, free-to-start studio course covering visual hierarchy, user research basics, accessible color contrast, and building multi-screen interactive prototypes in Figma.',
+        outcomes: [
+          'Master Figma Auto-Layout, Variables, and reusable Component Variants',
+          'Apply typography scales, spacing grids, and WCAG color contrast rules',
+          'Conduct rapid usability tests and turn wireframes into polished UI',
+          'Create a 3-project UX case study portfolio ready for design interviews'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Visual Design Fundamentals',
+            duration: '5h 00m',
+            lessons: [
+              { title: '1.1 Typography, Hierarchy & Rhythm', time: '45m' },
+              { title: '1.2 Color Theory & Accessible Palettes', time: '50m' },
+              { title: '1.3 Mastering the 8pt Grid System', time: '40m' }
+            ]
+          },
+          {
+            module: 'Module 2: Figma Mastery & Design Systems',
+            duration: '6h 30m',
+            lessons: [
+              { title: '2.1 Responsive Frames with Auto-Layout', time: '1h 25m' },
+              { title: '2.2 Building Tokens, Buttons & Form Libraries', time: '1h 45m' }
+            ]
+          },
+          {
+            module: 'Module 3: Prototyping & Developer Handoff',
+            duration: '4h 30m',
+            lessons: [
+              { title: '3.1 Micro-interactions & Smart Animate', time: '1h 15m' },
+              { title: '3.2 Writing Specs Engineers Actually Love', time: '55m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Chloe Dubois', rating: 5, date: '1 week ago', comment: 'I cannot believe this course is free. Sophia’s Figma auto-layout tricks instantly leveled up my workflow.' },
+          { user: 'Mateo Silva', rating: 4, date: '1 month ago', comment: 'Super structured and practical. Great exercises after every single lesson.' }
+        ]
+      },
+      {
+        id: 'c4',
+        title: 'Modern HTML, CSS & Responsive Web Foundations',
+        category: 'Web Development',
+        level: 'Beginner',
+        instructorId: 'marcus',
+        rating: 4.8,
+        reviewCount: 2110,
+        studentsEnrolled: 15800,
+        durationHours: 12,
+        lessonsCount: 28,
+        price: 0,
+        themeGradient: 'from-sky-500 via-indigo-500 to-purple-600',
+        iconType: 'code',
+        shortDesc: 'Your launchpad into web development. Learn semantic HTML5, modern CSS Grid & Flexbox, and interactive JavaScript.',
+        fullDesc: 'Start your coding journey with confidence. Build 5 real websites—from a personal portfolio to a responsive restaurant landing page—while mastering how the web works under the hood.',
+        outcomes: [
+          'Write clean, accessible semantic HTML5 markup',
+          'Build fluid mobile-first layouts using CSS Flexbox and CSS Grid',
+          'Add dynamic interactivity with vanilla DOM JavaScript',
+          'Publish your custom portfolio live on the web'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: How the Web Works & Semantic HTML',
+            duration: '3h 30m',
+            lessons: [
+              { title: '1.1 Browsers, HTTP & Your First HTML Page', time: '30m' },
+              { title: '1.2 Forms, Inputs & Accessibility Best Practices', time: '55m' }
+            ]
+          },
+          {
+            module: 'Module 2: Modern CSS Layouts',
+            duration: '5h 00m',
+            lessons: [
+              { title: '2.1 The Box Model, Positioning & Variables', time: '1h 10m' },
+              { title: '2.2 Flexbox & CSS Grid Deep Dive', time: '1h 50m' }
+            ]
+          },
+          {
+            module: 'Module 3: JavaScript Interactivity',
+            duration: '3h 30m',
+            lessons: [
+              { title: '3.1 Selecting Elements & Handling User Events', time: '1h 15m' },
+              { title: '3.2 Building an Interactive Theme Switcher & Modal', time: '1h 05m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Sofia Rossi', rating: 5, date: '4 days ago', comment: 'Zero fluff, super encouraging pace, and great visual explanations of Flexbox and Grid.' }
+        ]
+      },
+      {
+        id: 'c5',
+        title: 'Digital Marketing & Content Growth Engine',
+        category: 'Digital Marketing',
+        level: 'Beginner',
+        instructorId: 'david',
+        rating: 4.7,
+        reviewCount: 645,
+        studentsEnrolled: 5400,
+        durationHours: 14,
+        lessonsCount: 30,
+        price: 39,
+        themeGradient: 'from-rose-500 via-pink-600 to-purple-700',
+        iconType: 'marketing',
+        shortDesc: 'Attract loyal customers organically with modern SEO, high-converting landing pages, email funnels, and analytics.',
+        fullDesc: 'Stop guessing what works on social media and search. Learn a repeatable customer acquisition system combining search intent research, storytelling copywriting, and conversion rate optimization.',
+        outcomes: [
+          'Conduct keyword & search-intent research to rank organic articles',
+          'Write high-converting landing page headlines and email sequences',
+          'Measure campaign ROI with GA4 and funnel attribution metrics',
+          'Launch a complete 90-day content distribution calendar'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Positioning & Customer Psychology',
+            duration: '4h 00m',
+            lessons: [
+              { title: '1.1 Crafting an Irresistible Value Proposition', time: '50m' },
+              { title: '1.2 Mapping the Buyer Journey', time: '45m' }
+            ]
+          },
+          {
+            module: 'Module 2: Search (SEO) & Content Engines',
+            duration: '5h 30m',
+            lessons: [
+              { title: '2.1 Topic Clusters & On-Page SEO Essentials', time: '1h 30m' },
+              { title: '2.2 Repurposing One Pillar Piece Across Channels', time: '1h 10m' }
+            ]
+          },
+          {
+            module: 'Module 3: Email Funnels & Analytics',
+            duration: '4h 30m',
+            lessons: [
+              { title: '3.1 Automated Welcome & Nurture Sequences', time: '1h 20m' },
+              { title: '3.2 Reading Funnel Metrics & A/B Testing', time: '1h 00m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'kenji Takahashi', rating: 5, date: '2 weeks ago', comment: 'Applied the landing page framework to my indie app and saw signups jump by 38% in two weeks.' }
+        ]
+      },
+      {
+        id: 'c6',
+        title: 'Machine Learning & Predictive Modeling in Python',
+        category: 'Data Science & AI',
+        level: 'Advanced',
+        instructorId: 'elena',
+        rating: 4.9,
+        reviewCount: 810,
+        studentsEnrolled: 6100,
+        durationHours: 28,
+        lessonsCount: 54,
+        price: 69,
+        themeGradient: 'from-teal-700 via-emerald-600 to-lime-600',
+        iconType: 'ai',
+        shortDesc: 'Master supervised & unsupervised learning, gradient boosting, neural networks, and model evaluation with Scikit-Learn & PyTorch.',
+        fullDesc: 'An intensive, practitioner-level course on building, validating, and deploying predictive machine learning models on tabular and time-series datasets.',
+        outcomes: [
+          'Train and tune Random Forests, XGBoost, and Neural Networks',
+          'Prevent data leakage with proper cross-validation pipelines',
+          'Interpret model predictions using SHAP values for stakeholders',
+          'Package trained models into fast REST inference endpoints'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Statistical Foundations & Validation',
+            duration: '7h 00m',
+            lessons: [
+              { title: '1.1 Bias-Variance Tradeoff & Cross-Validation', time: '1h 20m' },
+              { title: '1.2 Precision, Recall, ROC-AUC & Custom Metrics', time: '1h 15m' }
+            ]
+          },
+          {
+            module: 'Module 2: Tree Ensembles & Deep Learning',
+            duration: '12h 00m',
+            lessons: [
+              { title: '2.1 Gradient Boosting & Hyperparameter Tuning', time: '2h 10m' },
+              { title: '2.2 Building Neural Networks in PyTorch', time: '2h 45m' }
+            ]
+          },
+          {
+            module: 'Module 3: MLOps & Production Deployment',
+            duration: '9h 00m',
+            lessons: [
+              { title: '3.1 Model Drift Monitoring & Retraining', time: '1h 30m' },
+              { title: '3.2 Serving Predictions with FastAPI', time: '1h 50m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Nadia Kowalski', rating: 5, date: '3 weeks ago', comment: 'Finally a course that covers data leakage and model interpretability properly!' }
+        ]
+      },
+      {
+        id: 'c7',
+        title: 'Digital Illustration & Visual Storytelling',
+        category: 'Creative Arts',
+        level: 'Beginner',
+        instructorId: 'sophia',
+        rating: 4.8,
+        reviewCount: 530,
+        studentsEnrolled: 4820,
+        durationHours: 11,
+        lessonsCount: 24,
+        price: 35,
+        themeGradient: 'from-violet-600 via-fuchsia-600 to-pink-500',
+        iconType: 'art',
+        shortDesc: 'Learn composition, lighting, color harmony, and custom brushwork to create expressive editorial & brand illustrations.',
+        fullDesc: 'Unlock your visual voice. Whether you use an iPad or desktop drawing tablet, you will learn how to simplify complex shapes, balance warm and cool lighting, and illustrate memorable scenes.',
+        outcomes: [
+          'Compose balanced scenes using rule of thirds and focal points',
+          'Master light, shadow, and atmospheric color palettes',
+          'Design expressive characters and cohesive editorial spot illustrations',
+          'Export print-ready and web-optimized vector & raster artwork'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Shape Language & Composition',
+            duration: '3h 40m',
+            lessons: [
+              { title: '1.1 Thumbnail Sketching & Silhouette Clarity', time: '50m' },
+              { title: '1.2 Leading the Viewer’s Eye', time: '45m' }
+            ]
+          },
+          {
+            module: 'Module 2: Color, Light & Texture',
+            duration: '4h 20m',
+            lessons: [
+              { title: '2.1 Warm Light vs. Cool Shadows', time: '1h 15m' },
+              { title: '2.2 Adding Grain, Depth & Atmosphere', time: '55m' }
+            ]
+          },
+          {
+            module: 'Module 3: Final Editorial Illustration Project',
+            duration: '3h 00m',
+            lessons: [
+              { title: '3.1 From Client Brief to Final Polish', time: '1h 40m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Maya Lin', rating: 5, date: '1 month ago', comment: 'The lighting lesson alone completely transformed how my illustrations look!' }
+        ]
+      },
+      {
+        id: 'c8',
+        title: 'Startup Finance, Unit Economics & Fundraising',
+        category: 'Business & Finance',
+        level: 'Intermediate',
+        instructorId: 'david',
+        rating: 4.8,
+        reviewCount: 412,
+        studentsEnrolled: 3890,
+        durationHours: 10,
+        lessonsCount: 22,
+        price: 45,
+        themeGradient: 'from-slate-800 via-indigo-900 to-blue-800',
+        iconType: 'business',
+        shortDesc: 'Build investor-ready financial models, master CAC/LTV unit economics, and structure sustainable business growth.',
+        fullDesc: 'Demystify startup and small-business finance without an accounting background. Learn how to forecast cash runway, price your product profitably, and communicate metrics clearly.',
+        outcomes: [
+          'Build a dynamic 3-year revenue and cash-flow spreadsheet model',
+          'Calculate and improve CAC, LTV, Gross Margin, and Net Dollar Retention',
+          'Understand equity, cap tables, SAFE notes, and valuation basics',
+          'Craft a crisp 10-slide financial narrative for stakeholders'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Unit Economics & Pricing',
+            duration: '3h 30m',
+            lessons: [
+              { title: '1.1 Gross Margin, CAC & Payback Periods', time: '55m' },
+              { title: '1.2 Value-Based Pricing Tiers', time: '50m' }
+            ]
+          },
+          {
+            module: 'Module 2: Cash Flow & Financial Modeling',
+            duration: '4h 00m',
+            lessons: [
+              { title: '2.1 Building a Bottom-Up Forecast from Scratch', time: '1h 35m' },
+              { title: '2.2 Managing Burn Rate & Runway Scenarios', time: '55m' }
+            ]
+          },
+          {
+            module: 'Module 3: Fundraising & Cap Tables',
+            duration: '2h 30m',
+            lessons: [
+              { title: '3.1 How Dilution & SAFEs Work', time: '1h 05m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Omar Farooq', rating: 5, date: '2 weeks ago', comment: 'Clear, no-nonsense financial literacy every founder and product manager should know.' }
+        ]
+      },
+      {
+        id: 'c9',
+        title: 'Product Strategy & Agile Leadership',
+        category: 'Business & Finance',
+        level: 'Advanced',
+        instructorId: 'david',
+        rating: 4.7,
+        reviewCount: 389,
+        studentsEnrolled: 4120,
+        durationHours: 13,
+        lessonsCount: 26,
+        price: 55,
+        themeGradient: 'from-cyan-700 via-blue-700 to-indigo-800',
+        iconType: 'business',
+        shortDesc: 'Prioritize high-impact features, align engineering and design teams, and ship products customers genuinely need.',
+        fullDesc: 'Step into senior product leadership. Learn continuous customer discovery, outcome-driven roadmaps, and how to say "no" gracefully while keeping teams energized.',
+        outcomes: [
+          'Run structured customer discovery interviews without leading bias',
+          'Replace feature-factory backlogs with outcome-driven roadmaps',
+          'Align cross-functional engineering, design, and marketing squads',
+          'Define North Star metrics and healthy guardrail KPIs'
+        ],
+        syllabus: [
+          {
+            module: 'Module 1: Customer Discovery & Strategy',
+            duration: '4h 30m',
+            lessons: [
+              { title: '1.1 Jobs-to-be-Done & Opportunity Solution Trees', time: '1h 15m' },
+              { title: '1.2 Writing Crisp Product Strategy Memos', time: '55m' }
+            ]
+          },
+          {
+            module: 'Module 2: Prioritization & Execution',
+            duration: '5h 00m',
+            lessons: [
+              { title: '2.1 RICE, ICE & Impact Mapping in Practice', time: '1h 20m' },
+              { title: '2.2 Running Calm, High-Velocity Sprints', time: '1h 10m' }
+            ]
+          },
+          {
+            module: 'Module 3: Metrics & Stakeholder Alignment',
+            duration: '3h 30m',
+            lessons: [
+              { title: '3.1 North Star Metrics & Leading Indicators', time: '1h 05m' }
+            ]
+          }
+        ],
+        reviews: [
+          { user: 'Elena Gomez', rating: 5, date: '3 weeks ago', comment: 'The opportunity solution tree workshop changed how our entire product team plans quarters.' }
+        ]
+      }
+    ];
+
+    // -----------------------------------------------------------------------
+    // 2. APPLICATION STATE (With LocalStorage Persistence)
+    // -----------------------------------------------------------------------
+    const STORAGE_KEY = 'lumina_learn_state_v1';
+
+    let appState = {
+      selectedCategory: 'All Courses',
+      selectedLevel: 'All',
+      selectedInstructorId: null,
+      searchQuery: '',
+      sortBy: 'popular',
+      // Pre-populate 2 enrolled courses so "My Learning" feels immediately alive
+      enrolledCourses: {
+        'c3': { progress: 45, enrolledAt: 'Oct 12, 2026', lastLesson: '2.1 Responsive Frames with Auto-Layout' },
+        'c4': { progress: 15, enrolledAt: 'Nov 02, 2026', lastLesson: '1.2 Forms, Inputs & Accessibility Best Practices' }
+      },
+      activeCourseId: null,
+      activeModalTab: 'overview'
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.enrolledCourses) {
+            appState.enrolledCourses = parsed.enrolledCourses;
+          }
+        }
+      } catch (e) {
+        console.warn('Unable to read localStorage:', e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          enrolledCourses: appState.enrolledCourses
+        }));
+      } catch (e) {
+        console.warn('Unable to save localStorage:', e);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. CUSTOM SVG THUMBNAIL ARTWORK GENERATOR
+    // -----------------------------------------------------------------------
+    function getCourseThumbnailSVG(course) {
+      const patterns = {
+        code: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="340" cy="30" r="90" fill="white" fill-opacity="0.08"/>
+            <circle cx="60" cy="180" r="70" fill="white" fill-opacity="0.06"/>
+            <rect x="48" y="38" width="190" height="124" rx="14" fill="white" fill-opacity="0.14" stroke="white" stroke-opacity="0.28" stroke-width="1.5"/>
+            <circle cx="68" cy="56" r="4" fill="#FCA5A5"/>
+            <circle cx="82" cy="56" r="4" fill="#FDE047"/>
+            <circle cx="96" cy="56" r="4" fill="#86EFAC"/>
+            <rect x="66" y="76" width="84" height="8" rx="4" fill="white" fill-opacity="0.7"/>
+            <rect x="82" y="94" width="124" height="8" rx="4" fill="#93C5FD" fill-opacity="0.8"/>
+            <rect x="82" y="112" width="96" height="8" rx="4" fill="white" fill-opacity="0.5"/>
+            <rect x="66" y="130" width="60" height="8" rx="4" fill="#A5F3FC" fill-opacity="0.75"/>
+            <path d="M285 82L265 102L285 122M325 82L345 102L325 122M310 74L300 130" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.85"/>
+          </svg>`,
+        ai: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="320" cy="160" r="100" fill="white" fill-opacity="0.08"/>
+            <circle cx="90" cy="40" r="65" fill="white" fill-opacity="0.07"/>
+            <line x1="110" y1="65" x2="200" y2="100" stroke="white" stroke-opacity="0.45" stroke-width="2"/>
+            <line x1="110" y1="135" x2="200" y2="100" stroke="white" stroke-opacity="0.45" stroke-width="2"/>
+            <line x1="200" y1="100" x2="290" y2="65" stroke="white" stroke-opacity="0.45" stroke-width="2"/>
+            <line x1="200" y1="100" x2="290" y2="135" stroke="white" stroke-opacity="0.45" stroke-width="2"/>
+            <line x1="200" y1="45" x2="200" y2="155" stroke="white" stroke-opacity="0.3" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle cx="110" cy="65" r="14" fill="white" fill-opacity="0.22" stroke="white" stroke-width="2"/>
+            <circle cx="110" cy="135" r="14" fill="white" fill-opacity="0.22" stroke="white" stroke-width="2"/>
+            <circle cx="200" cy="100" r="24" fill="white" fill-opacity="0.3" stroke="white" stroke-width="2.5"/>
+            <circle cx="200" cy="100" r="8" fill="white"/>
+            <circle cx="290" cy="65" r="14" fill="white" fill-opacity="0.22" stroke="white" stroke-width="2"/>
+            <circle cx="290" cy="135" r="14" fill="white" fill-opacity="0.22" stroke="white" stroke-width="2"/>
+          </svg>`,
+        design: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="70" cy="40" r="80" fill="white" fill-opacity="0.08"/>
+            <rect x="75" y="42" width="135" height="116" rx="16" fill="white" fill-opacity="0.16" stroke="white" stroke-width="2"/>
+            <circle cx="115" cy="82" r="18" fill="white" fill-opacity="0.75"/>
+            <rect x="97" y="112" width="90" height="10" rx="5" fill="white" fill-opacity="0.7"/>
+            <rect x="97" y="130" width="62" height="8" rx="4" fill="white" fill-opacity="0.45"/>
+            <rect x="230" y="56" width="95" height="88" rx="14" fill="white" fill-opacity="0.22" stroke="white" stroke-dasharray="5 5" stroke-width="2"/>
+            <path d="M262 84L296 100L278 106L272 122L262 84Z" fill="white"/>
+          </svg>`,
+        marketing: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="330" cy="50" r="85" fill="white" fill-opacity="0.08"/>
+            <rect x="76" y="118" width="32" height="44" rx="8" fill="white" fill-opacity="0.35"/>
+            <rect x="124" y="94" width="32" height="68" rx="8" fill="white" fill-opacity="0.5"/>
+            <rect x="172" y="70" width="32" height="92" rx="8" fill="white" fill-opacity="0.7"/>
+            <rect x="220" y="44" width="32" height="118" rx="8" fill="white" fill-opacity="0.9"/>
+            <path d="M88 102L140 76L188 54L244 28" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="244" cy="28" r="7" fill="#FDE047"/>
+            <circle cx="308" cy="112" r="34" stroke="white" stroke-opacity="0.5" stroke-width="3"/>
+            <circle cx="308" cy="112" r="16" stroke="white" stroke-opacity="0.8" stroke-width="3"/>
+            <circle cx="308" cy="112" r="5" fill="white"/>
+          </svg>`,
+        art: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="295" cy="95" r="65" fill="white" fill-opacity="0.16"/>
+            <circle cx="135" cy="115" r="55" fill="#FDE047" fill-opacity="0.25"/>
+            <path d="M65 145C115 70 175 160 235 80C275 30 320 95 345 65" stroke="white" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="115" cy="62" r="10" fill="white" fill-opacity="0.8"/>
+            <circle cx="145" cy="52" r="7" fill="#FDE047" fill-opacity="0.9"/>
+            <circle cx="170" cy="65" r="9" fill="#93C5FD" fill-opacity="0.9"/>
+          </svg>`,
+        business: `
+          <svg class="w-full h-full opacity-90" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="320" cy="150" r="95" fill="white" fill-opacity="0.07"/>
+            <rect x="75" y="46" width="250" height="108" rx="16" fill="white" fill-opacity="0.13" stroke="white" stroke-opacity="0.3" stroke-width="1.5"/>
+            <circle cx="135" cy="100" r="32" stroke="white" stroke-width="6" stroke-opacity="0.35"/>
+            <path d="M135 68A32 32 0 1 1 105 112" stroke="#34D399" stroke-width="6" stroke-linecap="round"/>
+            <rect x="195" y="76" width="98" height="10" rx="5" fill="white" fill-opacity="0.8"/>
+            <rect x="195" y="96" width="74" height="8" rx="4" fill="white" fill-opacity="0.5"/>
+            <rect x="195" y="114" width="86" height="8" rx="4" fill="#93C5FD" fill-opacity="0.75"/>
+          </svg>`
+      };
+      return patterns[course.iconType] || patterns.code;
+    }
+
+    function getLevelBadgeClasses(level) {
+      if (level === 'Beginner') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      if (level === 'Intermediate') return 'bg-amber-50 text-amber-700 border-amber-200';
+      return 'bg-rose-50 text-rose-700 border-rose-200';
+    }
+
+    function renderStarIcons(rating, sizeClass = 'w-4 h-4') {
+      const fullStars = Math.round(rating);
+      let html = '<div class="inline-flex items-center gap-0.5 text-amber-400">';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= fullStars) {
+          html += `<svg class="${sizeClass} fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+        } else {
+          html += `<svg class="${sizeClass} text-slate-200 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+        }
+      }
+      html += '</div>';
+      return html;
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. FILTERING & SORTING LOGIC
+    // -----------------------------------------------------------------------
+    function getFilteredCourses() {
+      const query = appState.searchQuery.trim().toLowerCase();
+
+      let filtered = COURSES.filter(course => {
+        // Category filter
+        if (appState.selectedCategory !== 'All Courses' && course.category !== appState.selectedCategory) {
+          return false;
+        }
+        // Level filter
+        if (appState.selectedLevel !== 'All' && course.level !== appState.selectedLevel) {
+          return false;
+        }
+        // Instructor filter
+        if (appState.selectedInstructorId && course.instructorId !== appState.selectedInstructorId) {
+          return false;
+        }
+        // Search query filter (title, category, shortDesc, outcomes, instructor name, or "free")
+        if (query) {
+          const instructor = INSTRUCTORS[course.instructorId];
+          const isFreeMatch = query === 'free' && course.price === 0;
+          const haystack = [
+            course.title,
+            course.category,
+            course.level,
+            course.shortDesc,
+            instructor.name,
+            ...course.outcomes
+          ].join(' ').toLowerCase();
+
+          if (!haystack.includes(query) && !isFreeMatch) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      // Sorting
+      filtered.sort((a, b) => {
+        if (appState.sortBy === 'rating') {
+          return b.rating - a.rating || b.reviewCount - a.reviewCount;
+        }
+        if (appState.sortBy === 'duration') {
+          return a.durationHours - b.durationHours;
+        }
+        if (appState.sortBy === 'price-low') {
+          return a.price - b.price;
+        }
+        // Default: Most Popular
+        return b.studentsEnrolled - a.studentsEnrolled;
+      });
+
+      return filtered;
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. RENDER FUNCTIONS: CATEGORIES, COURSES GRID & INSTRUCTORS
+    // -----------------------------------------------------------------------
+    function renderCategoryPills() {
+      const container = document.getElementById('category-pills-container');
+      container.innerHTML = CATEGORIES.map(cat => {
+        const isActive = appState.selectedCategory === cat;
+        const count = cat === 'All Courses'
+          ? COURSES.length
+          : COURSES.filter(c => c.category === cat).length;
+
+        return `
+          <button
+            onclick="setCategoryFilter('${cat}')"
+            class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all border ${
+              isActive
+                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-700'
+            }"
+          >
+            <span>${cat}</span>
+            <span class="px-1.5 py-0.5 text-[11px] rounded-md ${
+              isActive ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'
+            }">${count}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderCoursesGrid() {
+      const grid = document.getElementById('courses-grid');
+      const emptyState = document.getElementById('empty-state');
+      const countLabel = document.getElementById('results-count-label');
+      const filtered = getFilteredCourses();
+
+      countLabel.textContent = `Showing ${filtered.length} ${filtered.length === 1 ? 'course' : 'courses'}`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(course => {
+        const instructor = INSTRUCTORS[course.instructorId];
+        const isEnrolled = Boolean(appState.enrolledCourses[course.id]);
+        const priceDisplay = course.price === 0
+          ? '<span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-sm border border-emerald-200">Free</span>'
+          : `<span class="font-display font-extrabold text-xl text-slate-900">$${course.price}</span>`;
+
+        return `
+          <article class="group bg-white rounded-2xl border border-slate-200/90 hover:border-indigo-300 overflow-hidden shadow-soft hover:shadow-cardHover transition-all duration-300 flex flex-col">
+            <!-- Thumbnail Header -->
+            <div onclick="openCourseModal('${course.id}')" class="cursor-pointer relative h-44 bg-gradient-to-br ${course.themeGradient} overflow-hidden">
+              ${getCourseThumbnailSVG(course)}
+              <!-- Top Badges -->
+              <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-slate-900/65 backdrop-blur-md text-white text-[11px] font-semibold tracking-wide">
+                  ${course.category}
+                </span>
+                <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold bg-white/95 backdrop-blur-md ${getLevelBadgeClasses(course.level)}">
+                  ${course.level}
+                </span>
+              </div>
+              <!-- Enrolled Ribbon if applicable -->
+              ${isEnrolled ? `
+                <div class="absolute bottom-3 left-3.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold shadow-sm">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  Enrolled
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-5 sm:p-6 flex-1 flex flex-col">
+              <!-- Rating & Metadata Row -->
+              <div class="flex items-center justify-between text-xs text-slate-500 mb-2.5">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-slate-900 text-sm">${course.rating.toFixed(1)}</span>
+                  ${renderStarIcons(course.rating, 'w-3.5 h-3.5')}
+                  <span>(${course.reviewCount.toLocaleString()})</span>
+                </div>
+                <div class="flex items-center gap-1 font-medium text-slate-500">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>${course.durationHours}h • ${course.lessonsCount} lessons</span>
+                </div>
+              </div>
+
+              <!-- Title -->
+              <h3 onclick="openCourseModal('${course.id}')" class="cursor-pointer font-display font-bold text-lg text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug mb-2">
+                ${course.title}
+              </h3>
+
+              <!-- Short Description -->
+              <p class="text-sm text-slate-600 line-clamp-2 mb-4 leading-relaxed">
+                ${course.shortDesc}
+              </p>
+
+              <!-- Instructor Mini Row -->
+              <div class="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between mb-4">
+                <button onclick="filterByInstructor('${instructor.id}')" class="inline-flex items-center gap-2 text-left group/inst focus:outline-none" title="Filter courses by ${instructor.name}">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br ${instructor.avatarBg} text-white text-xs font-bold flex items-center justify-center shrink-0">
+                    ${instructor.initials}
+                  </div>
+                  <span class="text-xs font-medium text-slate-600 group-hover/inst:text-indigo-600 transition-colors">${instructor.name}</span>
+                </button>
+                <div>${priceDisplay}</div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <button
+                  onclick="openCourseModal('${course.id}')"
+                  class="py-2.5 px-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs sm:text-sm font-semibold transition-colors"
+                >
+                  View Details
+                </button>
+                ${isEnrolled
+                  ? `<button onclick="openMyLearningDrawer()" class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
+                      <span>Continue</span>
+                      <span>&rarr;</span>
+                    </button>`
+                  : `<button onclick="enrollInCourse('${course.id}')" class="py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs">
+                      Enroll Now
+                    </button>`
+                }
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderInstructorsSection() {
+      const grid = document.getElementById('instructors-grid');
+      const list = Object.values(INSTRUCTORS);
+
+      grid.innerHTML = list.map(inst => `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-soft hover:shadow-cardHover transition-all flex flex-col">
+          <div class="flex items-center gap-3.5 mb-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${inst.avatarBg} text-white font-display font-bold text-lg flex items-center justify-center shadow-sm shrink-0">
+              ${inst.initials}
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base text-slate-900">${inst.name}</h3>
+              <p class="text-xs font-medium text-indigo-600">${inst.title}</p>
+            </div>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4 flex-1">
+            ${inst.bio}
+          </p>
+
+          <div class="grid grid-cols-3 gap-2 py-3 px-2 rounded-xl bg-slate-50 border border-slate-100 text-center mb-4">
+            <div>
+              <div class="font-bold text-xs sm:text-sm text-slate-900">${inst.rating} ★</div>
+              <div class="text-[11px] text-slate-500">Rating</div>
+            </div>
+            <div class="border-x border-slate-200/80">
+              <div class="font-bold text-xs sm:text-sm text-slate-900">${inst.students}</div>
+              <div class="text-[11px] text-slate-500">Students</div>
+            </div>
+            <div>
+              <div class="font-bold text-xs sm:text-sm text-slate-900">${inst.coursesCount}</div>
+              <div class="text-[11px] text-slate-500">Courses</div>
+            </div>
+          </div>
+
+          <button
+            onclick="filterByInstructor('${inst.id}')"
+            class="w-full py-2.5 px-4 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-600 text-indigo-700 hover:text-white text-xs sm:text-sm font-semibold transition-colors"
+          >
+            View Courses by ${inst.name.split(' ')[0]}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. INTERACTIVE COURSE DETAIL MODAL
+    // -----------------------------------------------------------------------
+    function openCourseModal(courseId, initialTab = 'overview') {
+      const course = COURSES.find(c => c.id === courseId);
+      if (!course) return;
+
+      appState.activeCourseId = courseId;
+      appState.activeModalTab = initialTab;
+
+      document.getElementById('modal-breadcrumb-category').textContent = course.category;
+      document.getElementById('modal-breadcrumb-level').textContent = course.level;
+
+      renderCourseModalBody();
+
+      const modal = document.getElementById('course-detail-modal');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCourseModal() {
+      const modal = document.getElementById('course-detail-modal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      appState.activeCourseId = null;
+    }
+
+    function switchModalTab(tabName) {
+      appState.activeModalTab = tabName;
+      renderCourseModalBody();
+    }
+
+    function renderCourseModalBody() {
+      const course = COURSES.find(c => c.id === appState.activeCourseId);
+      if (!course) return;
+
+      const instructor = INSTRUCTORS[course.instructorId];
+      const isEnrolled = Boolean(appState.enrolledCourses[course.id]);
+      const body = document.getElementById('course-modal-body');
+
+      // Tab navigation buttons
+      const tabs = [
+        { id: 'overview', label: 'Overview & Outcomes' },
+        { id: 'curriculum', label: `Curriculum (${course.lessonsCount} Lessons)` },
+        { id: 'instructor', label: 'Instructor' },
+        { id: 'reviews', label: `Reviews (${course.reviews.length})` }
+      ];
+
+      const tabsHtml = tabs.map(t => {
+        const active = appState.activeModalTab === t.id;
+        return `
+          <button
+            onclick="switchModalTab('${t.id}')"
+            class="px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+              active
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }"
+          >
+            ${t.label}
+          </button>
+        `;
+      }).join('');
+
+      // Tab Content Sections
+      let tabContentHtml = '';
+
+      if (appState.activeModalTab === 'overview') {
+        tabContentHtml = `
+          <div class="space-y-6 animate-fade-in">
+            <div>
+              <h4 class="font-display font-bold text-lg text-slate-900 mb-2">About This Course</h4>
+              <p class="text-sm sm:text-base text-slate-600 leading-relaxed">${course.fullDesc}</p>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl border border-slate-200/80 p-5 sm:p-6">
+              <h4 class="font-display font-bold text-base text-slate-900 mb-4">What You'll Learn</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                ${course.outcomes.map(item => `
+                  <div class="flex items-start gap-2.5">
+                    <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <span class="text-sm text-slate-700 leading-snug">${item}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (appState.activeModalTab === 'curriculum') {
+        tabContentHtml = `
+          <div class="space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between">
+              <h4 class="font-display font-bold text-lg text-slate-900">Course Syllabus</h4>
+              <span class="text-xs font-medium text-slate-500">${course.syllabus.length} Modules • ${course.durationHours} Total Hours</span>
+            </div>
+            <div class="space-y-3">
+              ${course.syllabus.map((mod, idx) => `
+                <details ${idx === 0 ? 'open' : ''} class="group bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                  <summary class="cursor-pointer list-none px-5 py-4 bg-slate-50 hover:bg-slate-100/80 flex items-center justify-between gap-3 font-semibold text-sm text-slate-900">
+                    <div class="flex items-center gap-2.5">
+                      <svg class="w-4 h-4 text-indigo-600 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                      <span>${mod.module}</span>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 shrink-0">${mod.duration}</span>
+                  </summary>
+                  <div class="divide-y divide-slate-100 px-5 py-2">
+                    ${mod.lessons.map((lesson, lIdx) => `
+                      <div class="py-3 flex items-center justify-between gap-3 text-sm">
+                        <div class="flex items-center gap-2.5 text-slate-700">
+                          <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                          <span>${lesson.title}</span>
+                          ${idx === 0 && lIdx === 0 ? '<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-indigo-50 text-indigo-600">Free Preview</span>' : ''}
+                        </div>
+                        <span class="text-xs text-slate-400 font-medium">${lesson.time}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (appState.activeModalTab === 'instructor') {
+        tabContentHtml = `
+          <div class="bg-slate-50 rounded-2xl border border-slate-200/80 p-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br ${instructor.avatarBg} text-white font-display font-bold text-xl flex items-center justify-center shadow-sm shrink-0">
+                ${instructor.initials}
+              </div>
+              <div>
+                <h4 class="font-display font-bold text-xl text-slate-900">${instructor.name}</h4>
+                <p class="text-sm font-medium text-indigo-600">${instructor.title}</p>
+                <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-600 font-medium">
+                  <span>★ ${instructor.rating} Instructor Rating</span>
+                  <span>• ${instructor.students} Students</span>
+                  <span>• ${instructor.coursesCount} Courses</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm text-slate-700 leading-relaxed mb-5">${instructor.bio}</p>
+            <button onclick="closeCourseModal(); filterByInstructor('${instructor.id}');" class="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 text-xs font-semibold transition-colors">
+              View All Courses by ${instructor.name} &rarr;
+            </button>
+          </div>
+        `;
+      } else if (appState.activeModalTab === 'reviews') {
+        tabContentHtml = `
+          <div class="space-y-6 animate-fade-in">
+            <!-- Rating Summary Banner -->
+            <div class="flex flex-col sm:flex-row items-center gap-6 bg-slate-50 rounded-2xl border border-slate-200/80 p-5">
+              <div class="text-center sm:px-4">
+                <div class="font-display font-extrabold text-4xl text-slate-900">${course.rating.toFixed(1)}</div>
+                <div class="my-1">${renderStarIcons(course.rating, 'w-4 h-4')}</div>
+                <div class="text-xs text-slate-500 font-medium">${course.reviewCount.toLocaleString()} ratings</div>
+              </div>
+              <div class="flex-1 w-full space-y-1.5 text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="w-10 text-slate-600 font-medium">5 star</span>
+                  <div class="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-amber-400 rounded-full" style="width: 84%"></div></div>
+                  <span class="w-8 text-right text-slate-500">84%</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-10 text-slate-600 font-medium">4 star</span>
+                  <div class="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-amber-400 rounded-full" style="width: 13%"></div></div>
+                  <span class="w-8 text-right text-slate-500">13%</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-10 text-slate-600 font-medium">3 star</span>
+                  <div class="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-amber-400 rounded-full" style="width: 3%"></div></div>
+                  <span class="w-8 text-right text-slate-500">3%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="space-y-3">
+              ${course.reviews.map(rev => `
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
+                        ${rev.user.charAt(0)}
+                      </div>
+                      <span class="font-semibold text-sm text-slate-900">${rev.user}</span>
+                    </div>
+                    <span class="text-xs text-slate-400">${rev.date}</span>
+                  </div>
+                  <div class="mb-2">${renderStarIcons(rev.rating, 'w-3.5 h-3.5')}</div>
+                  <p class="text-sm text-slate-600 leading-relaxed">${rev.comment}</p>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Add Student Review Form -->
+            <form onsubmit="submitCourseReview(event, '${course.id}')" class="bg-indigo-50/60 rounded-2xl border border-indigo-100 p-5 space-y-3">
+              <h5 class="font-display font-bold text-sm text-slate-900">Share Your Review</h5>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input id="review-name-input" type="text" required placeholder="Your name" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-indigo-500" />
+                <select id="review-rating-input" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-indigo-500">
+                  <option value="5">★★★★★ (5/5) Excellent</option>
+                  <option value="4">★★★★☆ (4/5) Very Good</option>
+                  <option value="3">★★★☆☆ (3/5) Good</option>
+                </select>
+              </div>
+              <textarea id="review-comment-input" rows="2" required placeholder="What did you enjoy most about this course?" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-indigo-500"></textarea>
+              <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
+                Post Review
+              </button>
+            </form>
+          </div>
+        `;
+      }
+
+      // Main Two-Column Modal Layout
+      body.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Left 2 Columns: Course Header + Tabs + Tab Content -->
+          <div class="lg:col-span-2">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${getLevelBadgeClasses(course.level)}">${course.level}</span>
+              <span class="text-xs font-medium text-slate-500">${course.studentsEnrolled.toLocaleString()} students enrolled</span>
+            </div>
+
+            <h2 id="modal-title" class="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3">
+              ${course.title}
+            </h2>
+
+            <p class="text-sm sm:text-base text-slate-600 mb-4 leading-relaxed">
+              ${course.shortDesc}
+            </p>
+
+            <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600 pb-6 border-b border-slate-200">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-slate-900">${course.rating.toFixed(1)}</span>
+                ${renderStarIcons(course.rating)}
+                <span class="text-slate-400">(${course.reviewCount.toLocaleString()})</span>
+              </div>
+              <span>•</span>
+              <span>Created by <strong class="text-slate-900">${instructor.name}</strong></span>
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar border-b border-slate-200 mt-2 mb-6">
+              ${tabsHtml}
+            </div>
+
+            <!-- Active Tab Body -->
+            <div>${tabContentHtml}</div>
+          </div>
+
+          <!-- Right Column: Sticky Enrollment Card -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border-2 border-slate-200/90 overflow-hidden shadow-soft sticky top-20">
+              <div class="h-36 bg-gradient-to-br ${course.themeGradient} relative">
+                ${getCourseThumbnailSVG(course)}
+              </div>
+
+              <div class="p-6">
+                <div class="flex items-baseline justify-between mb-4">
+                  ${course.price === 0
+                    ? '<span class="font-display font-extrabold text-3xl text-emerald-600">Free</span><span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">Open Access</span>'
+                    : `<div><span class="font-display font-extrabold text-3xl text-slate-900">$${course.price}</span> <span class="text-xs text-slate-400 line-through ml-1">$${course.price + 40}</span></div><span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">Lifetime Access</span>`
+                  }
+                </div>
+
+                ${isEnrolled
+                  ? `<div class="space-y-2.5 mb-5">
+                      <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <span>You are enrolled in this course!</span>
+                      </div>
+                      <button onclick="closeCourseModal(); openMyLearningDrawer();" class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-sm font-bold transition-colors">
+                        Go to My Learning &rarr;
+                      </button>
+                    </div>`
+                  : `<button onclick="enrollInCourse('${course.id}', true)" class="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-all shadow-md hover:shadow-lg active:scale-[0.99] mb-5">
+                      ${course.price === 0 ? 'Start Learning for Free' : 'Enroll in Course Now'}
+                    </button>`
+                }
+
+                <div class="space-y-3 text-xs sm:text-sm text-slate-600 pt-4 border-t border-slate-100">
+                  <div class="flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span><strong>${course.durationHours} hours</strong> of on-demand video</span>
+                  </div>
+                  <div class="flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span><strong>${course.lessonsCount} structured lessons</strong> & projects</span>
+                  </div>
+                  <div class="flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                    <span>Shareable <strong>Certificate of Completion</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function submitCourseReview(event, courseId) {
+      event.preventDefault();
+      const course = COURSES.find(c => c.id === courseId);
+      if (!course) return;
+
+      const nameInput = document.getElementById('review-name-input');
+      const ratingInput = document.getElementById('review-rating-input');
+      const commentInput = document.getElementById('review-comment-input');
+
+      const newReview = {
+        user: nameInput.value.trim() || 'Student',
+        rating: parseInt(ratingInput.value, 10) || 5,
+        date: 'Just now',
+        comment: commentInput.value.trim()
+      };
+
+      course.reviews.unshift(newReview);
+      course.reviewCount += 1;
+
+      renderCourseModalBody();
+      renderCoursesGrid();
+      showToast('Thank you! Your review has been published.', 'success');
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. ENROLLMENT & "MY LEARNING" DRAWER LOGIC
+    // -----------------------------------------------------------------------
+    function enrollInCourse(courseId, refreshModal = false) {
+      const course = COURSES.find(c => c.id === courseId);
+      if (!course) return;
+
+      if (!appState.enrolledCourses[courseId]) {
+        const firstLessonTitle = course.syllabus[0]?.lessons[0]?.title || '1.1 Course Introduction';
+        appState.enrolledCourses[courseId] = {
+          progress: 5,
+          enrolledAt: 'Today',
+          lastLesson: firstLessonTitle
+        };
+        course.studentsEnrolled += 1;
+        saveState();
+        updateEnrolledBadge();
+        renderCoursesGrid();
+        if (refreshModal) {
+          renderCourseModalBody();
+        }
+        showToast(`Enrolled in "${course.title}"!`, 'success');
+      }
+    }
+
+    function advanceLessonProgress(courseId) {
+      const entry = appState.enrolledCourses[courseId];
+      if (!entry) return;
+
+      entry.progress = Math.min(100, entry.progress + 25);
+      saveState();
+      renderMyLearningList();
+      if (entry.progress === 100) {
+        showToast('Congratulations! You completed 100% of the course!', 'success');
+      } else {
+        showToast(`Lesson completed! Progress is now ${entry.progress}%.`, 'info');
+      }
+    }
+
+    function updateEnrolledBadge() {
+      const badge = document.getElementById('enrolled-count-badge');
+      const count = Object.keys(appState.enrolledCourses).length;
+      badge.textContent = count;
+    }
+
+    function openMyLearningDrawer() {
+      renderMyLearningList();
+      const drawer = document.getElementById('my-learning-drawer');
+      drawer.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMyLearningDrawer() {
+      const drawer = document.getElementById('my-learning-drawer');
+      drawer.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function renderMyLearningList() {
+      const container = document.getElementById('my-learning-list');
+      const enrolledIds = Object.keys(appState.enrolledCourses);
+
+      if (enrolledIds.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 px-4">
+            <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+            <h3 class="font-display font-bold text-base text-slate-900 mb-1">No enrolled courses yet</h3>
+            <p class="text-xs text-slate-500">Explore our catalog and click "Enroll Now" on any course to start tracking progress.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = enrolledIds.map(id => {
+        const course = COURSES.find(c => c.id === id);
+        const record = appState.enrolledCourses[id];
+        if (!course) return '';
+
+        const isDone = record.progress >= 100;
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600">${course.category}</span>
+              <span class="text-[11px] font-semibold ${isDone ? 'text-emerald-600' : 'text-slate-500'}">
+                ${isDone ? 'Completed ★' : `${record.progress}% complete`}
+              </span>
+            </div>
+
+            <h4 onclick="closeMyLearningDrawer(); openCourseModal('${course.id}', 'curriculum');" class="cursor-pointer font-display font-bold text-sm text-slate-900 hover:text-indigo-600 transition-colors mb-2">
+              ${course.title}
+            </h4>
+
+            <!-- Progress Bar -->
+            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden mb-3">
+              <div class="h-full rounded-full transition-all duration-300 ${isDone ? 'bg-emerald-500' : 'bg-indigo-600'}" style="width: ${record.progress}%"></div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2">
+              <button onclick="closeMyLearningDrawer(); openCourseModal('${course.id}', 'curriculum');" class="text-xs font-semibold text-slate-600 hover:text-indigo-600">
+                View Syllabus
+              </button>
+              ${isDone
+                ? `<span class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">Certificate Ready</span>`
+                : `<button onclick="advanceLessonProgress('${course.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors">
+                    Complete Next Lesson
+                  </button>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. FILTER & CONTROL EVENT HANDLERS
+    // -----------------------------------------------------------------------
+    function setCategoryFilter(category) {
+      appState.selectedCategory = category;
+      renderCategoryPills();
+      renderCoursesGrid();
+    }
+
+    function setLevelFilter(level) {
+      appState.selectedLevel = level;
+      document.querySelectorAll('.level-btn').forEach(btn => {
+        if (btn.dataset.level === level) {
+          btn.className = 'level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white transition-all';
+        } else {
+          btn.className = 'level-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all';
+        }
+      });
+      renderCoursesGrid();
+    }
+
+    function setSortBy(sortValue) {
+      appState.sortBy = sortValue;
+      renderCoursesGrid();
+    }
+
+    function handleSearchInput(val) {
+      appState.searchQuery = val;
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (val.trim().length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderCoursesGrid();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('search-input');
+      input.value = '';
+      handleSearchInput('');
+    }
+
+    function quickSearch(term) {
+      const input = document.getElementById('search-input');
+      input.value = term;
+      handleSearchInput(term);
+      document.getElementById('explore-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function filterByInstructor(instructorId) {
+      const inst = INSTRUCTORS[instructorId];
+      if (!inst) return;
+      appState.selectedInstructorId = instructorId;
+      appState.selectedCategory = 'All Courses';
+
+      const chip = document.getElementById('active-instructor-chip');
+      document.getElementById('active-instructor-name').textContent = inst.name;
+      chip.classList.remove('hidden');
+
+      renderCategoryPills();
+      renderCoursesGrid();
+      document.getElementById('explore-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearInstructorFilter() {
+      appState.selectedInstructorId = null;
+      document.getElementById('active-instructor-chip').classList.add('hidden');
+      renderCoursesGrid();
+    }
+
+    function applyPathFilter(categoryName) {
+      setCategoryFilter(categoryName);
+      document.getElementById('explore-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetAllFilters() {
+      appState.selectedCategory = 'All Courses';
+      appState.selectedLevel = 'All';
+      appState.selectedInstructorId = null;
+      appState.searchQuery = '';
+      appState.sortBy = 'popular';
+
+      document.getElementById('search-input').value = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      document.getElementById('sort-select').value = 'popular';
+      document.getElementById('active-instructor-chip').classList.add('hidden');
+
+      setLevelFilter('All');
+      renderCategoryPills();
+      renderCoursesGrid();
+    }
+
+    // -----------------------------------------------------------------------
+    // 9. TOAST NOTIFICATION SYSTEM (No alert())
+    // -----------------------------------------------------------------------
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgStyle = type === 'success' ? 'bg-slate-900 text-white border-emerald-500/40' : 'bg-indigo-900 text-white border-indigo-400/40';
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-lg text-xs sm:text-sm font-medium animate-slide-up ${bgStyle}`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-400' : 'bg-amber-300'}"></span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+      }, 3200);
+    }
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeCourseModal();
+        closeMyLearningDrawer();
+      }
+    });
+
+    // -----------------------------------------------------------------------
+    // 10. INITIALIZE APP
+    // -----------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      updateEnrolledBadge();
+      renderCategoryPills();
+      renderCoursesGrid();
+      renderInstructorsSection();
+    });
+  </script>
+</body>
+</html>
